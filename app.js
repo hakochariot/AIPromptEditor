@@ -1,5 +1,5 @@
 // app.js — Prompt Assist (Vanilla JS) with Clipboard History & Favorites
-// Note: Generate button / generateImage logic removed.
+// Note: Styles/Artists (TAGS) removed, and related DOM logic eliminated.
 
 const promptEl = document.getElementById('prompt');
 const negativeEl = document.getElementById('negative');
@@ -7,7 +7,6 @@ const suggestionsEl = document.getElementById('suggestions');
 const charCountEl = document.getElementById('charCount');
 const wordCountEl = document.getElementById('wordCount');
 const tokenEstimateEl = document.getElementById('tokenEstimate');
-const tagButtonsEl = document.getElementById('tagButtons');
 const copyBtn = document.getElementById('copyBtn');
 const savePresetBtn = document.getElementById('savePreset');
 const presetSelect = document.getElementById('presetSelect');
@@ -26,12 +25,6 @@ const SUGGESTIONS = [
   "concept art", "digital painting", "vivid colors", "soft lighting"
 ];
 
-const TAGS = [
-  "by greg rutkowski", "artstation", "studio ghibli", "hayao miyazaki",
-  "cinematic", "photorealism", "oil painting", "watercolor",
-  "trending on artstation", "dark fantasy", "vaporwave"
-];
-
 // localStorage keys
 const LS_FAV_KEY = 'pa_favorites';
 const LS_HISTORY_KEY = 'pa_clip_history';
@@ -47,17 +40,6 @@ function renderSuggestions() {
     chip.textContent = s;
     chip.addEventListener('click', () => insertSuggestion(s));
     suggestionsEl.appendChild(chip);
-  }
-}
-function renderTags() {
-  tagButtonsEl.innerHTML = '';
-  for (const t of TAGS) {
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'tag';
-    b.textContent = t;
-    b.addEventListener('click', () => insertAtCursor(promptEl, t));
-    tagButtonsEl.appendChild(b);
   }
 }
 
@@ -344,10 +326,9 @@ clearHistoryBtn.addEventListener('click', () => {
 /* ---------- Init ---------- */
 window.addEventListener('load', () => {
   renderSuggestions();
-  renderTags();
   renderFavorites();
   renderHistory();
   loadPresetOptions();
   updateStats();
-  log("Prompt Assist ready (Generate button removed).");
+  log("Prompt Assist ready (Styles/Artists removed).");
 });
