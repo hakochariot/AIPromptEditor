@@ -72,7 +72,14 @@ button, select, input[type="range"]{background:var(--accent);border:0;color:whit
 input[type=number]{padding:6px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.05);background:transparent;color:var(--text)}
 label > span{display:block;margin-top:6px}
 
-/* New styles for favorites and history */
+/* New: field row with inline controls */
+.field-row{display:flex;gap:8px;align-items:flex-start}
+.field-row textarea{flex:1}
+.field-controls{display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+.inline-copy{background:var(--accent-2);padding:8px 10px;border-radius:6px;border:0;color:white;cursor:pointer;font-size:13px}
+.inline-copy:hover{opacity:0.95}
+
+/* Favorites & history */
 .tags-row{display:flex;gap:18px;margin-top:12px;align-items:flex-start}
 .left-col{flex:1}
 .right-col{flex:1}
@@ -97,3 +104,15 @@ label > span{display:block;margin-top:6px}
 .history-meta{font-size:12px;color:#9aa6b2;margin-bottom:6px}
 .history-actions{display:flex;gap:6px;align-items:center}
 .history-actions button{padding:6px 8px;background:rgba(255,255,255,0.03);border-radius:6px;color:var(--muted);border:1px solid rgba(255,255,255,0.02);cursor:pointer}
+
+/* Negative details styling */
+.negative-details{margin-top:10px}
+.negative-details > summary{
+  list-style:none;
+  cursor:pointer;
+  color:var(--muted);
+  font-size:13px;
+  padding:6px 0;
+}
+.negative-details[open] > summary{color:var(--text)}
+.negative-details textarea{margin-top:8px}

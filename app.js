@@ -1,5 +1,5 @@
 // app.js — Prompt Assist (Vanilla JS) with Clipboard History & Favorites
-// 日本語化済み、ネガティブプロンプトを折りたたみ可能に（状態を localStorage に保存）
+// Updated: per-field copy buttons (prompt & negative) placed alongside each textarea.
 
 const promptEl = document.getElementById('prompt');
 const negativeEl = document.getElementById('negative');
@@ -8,10 +8,12 @@ const suggestionsEl = document.getElementById('suggestions');
 const charCountEl = document.getElementById('charCount');
 const wordCountEl = document.getElementById('wordCount');
 const tokenEstimateEl = document.getElementById('tokenEstimate');
-const copyBtn = document.getElementById('copyBtn');
 const savePresetBtn = document.getElementById('savePreset');
 const presetSelect = document.getElementById('presetSelect');
 const logEl = document.getElementById('log');
+
+const copyPromptBtn = document.getElementById('copyPromptBtn');
+const copyNegativeBtn = document.getElementById('copyNegativeBtn');
 
 const favoritesEl = document.getElementById('favorites');
 const favInput = document.getElementById('favInput');
@@ -280,15 +282,18 @@ function applyPreset(index) {
   log("プリセットを適用しました: " + p.name);
 }
 
-/* ---------- コピー動作（履歴へ追加） ---------- */
-async function copyPromptToClipboard() {
-  const full = buildFullPrompt();
+/* ---------- コピーヘルパー（任意のテキストをコピーして履歴へ追加） ---------- */
+async function copyAndRecord(text, labelForLog = 'コピー') {
+  if (!text) {
+    log('コピーするテキストが空です。', true);
+    return;
+  }
   try {
-    await navigator.clipboard.writeText(full);
-    log("プロンプトをクリップボードにコピーしました！");
-    addHistoryEntry(full);
+    await navigator.clipboard.writeText(text);
+    addHistoryEntry(text);
+    log(`${labelForLog}しました。`);
   } catch (err) {
-    log("コピーに失敗しました: " + err, true);
+    log(`${labelForLog}に失敗しました: ${err}`, true);
   }
 }
 
@@ -317,7 +322,10 @@ promptEl.addEventListener('keydown', (e) => {
   }
 });
 negativeEl.addEventListener('input', () => {/* no-op */});
-copyBtn.addEventListener('click', copyPromptToClipboard);
+
+if (copyPromptBtn) copyPromptBtn.addEventListener('click', () => copyAndRecord(buildFullPrompt(), 'プロンプトをコピー'));
+if (copyNegativeBtn) copyNegativeBtn.addEventListener('click', () => copyAndRecord(negativeEl.value.trim(), 'ネガティブプロンプトをコピー'));
+
 savePresetBtn.addEventListener('click', savePreset);
 presetSelect.addEventListener('change', (e) => {
   if (!e.target.value) return;

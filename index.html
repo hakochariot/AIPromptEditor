@@ -12,7 +12,13 @@
 
     <section class="editor">
       <label for="prompt">プロンプト（メイン）</label>
-      <textarea id="prompt" placeholder="例: ファンタジーの風景、劇的なライティング、高精細..."></textarea>
+      <div class="field-row">
+        <textarea id="prompt" placeholder="例: ファンタジーの風景、劇的なライティング、高精細..."></textarea>
+        <div class="field-controls">
+          <button id="copyPromptBtn" class="inline-copy" type="button">コピー</button>
+        </div>
+      </div>
+
       <div class="meta-row">
         <div id="suggestions" class="suggestions" aria-live="polite"></div>
         <div class="stats">
@@ -25,7 +31,12 @@
       <!-- 折りたたみ可能なネガティブプロンプト -->
       <details id="negativeDetails" class="negative-details">
         <summary>ネガティブプロンプト（クリックで開閉）</summary>
-        <textarea id="negative" placeholder="例: 低品質, ぼやけ, 変形..." aria-label="ネガティブプロンプト"></textarea>
+        <div class="field-row negative-row">
+          <textarea id="negative" placeholder="例: 低品質, ぼやけ, 変形..." aria-label="ネガティブプロンプト"></textarea>
+          <div class="field-controls">
+            <button id="copyNegativeBtn" class="inline-copy" type="button">コピー</button>
+          </div>
+        </div>
       </details>
 
       <div class="tags-row">
@@ -40,7 +51,6 @@
       </div>
 
       <div class="actions">
-        <button id="copyBtn">プロンプトをコピー</button>
         <button id="savePreset">プリセットを保存</button>
         <select id="presetSelect"><option value="">プリセットを読み込む...</option></select>
       </div>
@@ -55,7 +65,7 @@
         <div id="clipboardHistory" class="clipboard-history" aria-live="polite"></div>
       </section>
 
-      <!-- ログを履歴の下に移動 -->
+      <!-- ログ -->
       <div id="log" class="log" aria-live="polite"></div>
 
     </section>
