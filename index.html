@@ -22,8 +22,11 @@
         </div>
       </div>
 
-      <label for="negative">ネガティブプロンプト</label>
-      <textarea id="negative" placeholder="例: 低品質, ぼやけ, 変形..."></textarea>
+      <!-- 折りたたみ可能なネガティブプロンプト -->
+      <details id="negativeDetails" class="negative-details">
+        <summary>ネガティブプロンプト（クリックで開閉）</summary>
+        <textarea id="negative" placeholder="例: 低品質, ぼやけ, 変形..." aria-label="ネガティブプロンプト"></textarea>
+      </details>
 
       <div class="tags-row">
         <div class="right-col">
@@ -42,8 +45,6 @@
         <select id="presetSelect"><option value="">プリセットを読み込む...</option></select>
       </div>
 
-      <div id="log" class="log" aria-live="polite"></div>
-
       <section class="history-section">
         <div class="history-header">
           <h3>クリップボード履歴</h3>
@@ -53,6 +54,9 @@
         </div>
         <div id="clipboardHistory" class="clipboard-history" aria-live="polite"></div>
       </section>
+
+      <!-- ログを履歴の下に移動 -->
+      <div id="log" class="log" aria-live="polite"></div>
 
     </section>
   </main>

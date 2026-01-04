@@ -1,8 +1,9 @@
 // app.js — Prompt Assist (Vanilla JS) with Clipboard History & Favorites
-// 日本語化済み（Generate/Styles欄は削除済み）
+// 日本語化済み、ネガティブプロンプトを折りたたみ可能に（状態を localStorage に保存）
 
 const promptEl = document.getElementById('prompt');
 const negativeEl = document.getElementById('negative');
+const negativeDetails = document.getElementById('negativeDetails');
 const suggestionsEl = document.getElementById('suggestions');
 const charCountEl = document.getElementById('charCount');
 const wordCountEl = document.getElementById('wordCount');
@@ -29,6 +30,7 @@ const SUGGESTIONS = [
 const LS_FAV_KEY = 'pa_favorites';
 const LS_HISTORY_KEY = 'pa_clip_history';
 const LS_PRESETS_KEY = 'pa_presets';
+const LS_NEGATIVE_OPEN = 'pa_negative_open';
 const MAX_HISTORY = 100;
 
 function renderSuggestions() {
@@ -290,6 +292,22 @@ async function copyPromptToClipboard() {
   }
 }
 
+/* ---------- ネガティブ折りたたみ状態の保存/復元 ---------- */
+function loadNegativeOpenState() {
+  try {
+    const v = localStorage.getItem(LS_NEGATIVE_OPEN);
+    if (v === 'false') negativeDetails.open = false;
+    else negativeDetails.open = true; // デフォルトは開いている
+  } catch (e) { /* ignore */ }
+}
+if (negativeDetails) {
+  negativeDetails.addEventListener('toggle', () => {
+    try {
+      localStorage.setItem(LS_NEGATIVE_OPEN, negativeDetails.open ? 'true' : 'false');
+    } catch (e) {}
+  });
+}
+
 /* ---------- イベント & 初期化 ---------- */
 promptEl.addEventListener('input', updateStats);
 promptEl.addEventListener('keydown', (e) => {
@@ -328,6 +346,7 @@ window.addEventListener('load', () => {
   renderFavorites();
   renderHistory();
   loadPresetOptions();
+  loadNegativeOpenState();
   updateStats();
   log("準備ができました。");
 });
