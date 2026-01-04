@@ -1,5 +1,5 @@
 // app.js — Prompt Assist (Vanilla JS) with Clipboard History & Favorites
-// - Adds clipboard history and favorite phrases saved to localStorage.
+// Generation Options removed: steps/cfg/seed/sampler DOM elements and related logic eliminated.
 
 const promptEl = document.getElementById('prompt');
 const negativeEl = document.getElementById('negative');
@@ -9,12 +9,6 @@ const wordCountEl = document.getElementById('wordCount');
 const tokenEstimateEl = document.getElementById('tokenEstimate');
 const tagButtonsEl = document.getElementById('tagButtons');
 const copyBtn = document.getElementById('copyBtn');
-const stepsEl = document.getElementById('steps');
-const stepsVal = document.getElementById('stepsVal');
-const cfgEl = document.getElementById('cfg');
-const cfgVal = document.getElementById('cfgVal');
-const seedEl = document.getElementById('seed');
-const samplerEl = document.getElementById('sampler');
 const generateBtn = document.getElementById('generate');
 const savePresetBtn = document.getElementById('savePreset');
 const presetSelect = document.getElementById('presetSelect');
@@ -146,7 +140,6 @@ function renderFavorites() {
 function addFavorite(text) {
   if (!text || !text.trim()) return;
   const list = loadFavorites();
-  // avoid duplicates; push to front
   if (!list.includes(text)) list.unshift(text);
   saveFavorites(list);
   renderFavorites();
@@ -175,7 +168,6 @@ function saveHistory(list) {
 function addHistoryEntry(text) {
   if (!text) return;
   const list = loadHistory();
-  // avoid immediate duplicate: if newest equals text, skip
   if (list.length && list[0].text === text) return;
   const entry = {
     text,
@@ -231,7 +223,6 @@ function renderHistory() {
     insertBtn.textContent = 'Insert';
     insertBtn.title = 'Insert into prompt';
     insertBtn.addEventListener('click', () => {
-      // Insert at cursor
       insertAtCursor(promptEl, entry.text);
     });
 
@@ -242,7 +233,7 @@ function renderHistory() {
     copyBtnLocal.addEventListener('click', async () => {
       try {
         await navigator.clipboard.writeText(entry.text);
-        addHistoryEntry(entry.text); // bring to top
+        addHistoryEntry(entry.text);
         log('History item copied to clipboard.');
       } catch (err) {
         log('Copy failed: ' + err, true);
@@ -267,18 +258,16 @@ function renderHistory() {
   });
 }
 
-/* ---------- Presets (localStorage) ---------- */
+/* ---------- Presets (localStorage) ----------
+   Presets now store only prompt and negative (options were removed)
+*/
 function savePreset() {
   const name = prompt("Preset name?");
   if (!name) return;
   const p = {
     name,
     prompt: promptEl.value,
-    negative: negativeEl.value,
-    steps: stepsEl.value,
-    cfg: cfgEl.value,
-    seed: seedEl.value,
-    sampler: samplerEl.value
+    negative: negativeEl.value
   };
   const list = JSON.parse(localStorage.getItem(LS_PRESETS_KEY) || '[]');
   list.push(p);
@@ -304,11 +293,6 @@ function applyPreset(index) {
   if (!p) return;
   promptEl.value = p.prompt || '';
   negativeEl.value = p.negative || '';
-  stepsEl.value = p.steps || 30;
-  cfgEl.value = p.cfg || 7.5;
-  seedEl.value = p.seed || '';
-  samplerEl.value = p.sampler || samplerEl.value;
-  updateStepsCfg();
   updateStats();
   log("Preset applied: " + p.name);
 }
@@ -317,11 +301,7 @@ function applyPreset(index) {
 async function generateImage() {
   const payload = {
     prompt: buildFullPrompt(),
-    negative_prompt: negativeEl.value,
-    steps: Number(stepsEl.value),
-    cfg: Number(cfgEl.value),
-    seed: seedEl.value ? Number(seedEl.value) : null,
-    sampler: samplerEl.value
+    negative_prompt: negativeEl.value
   };
   log("Generating (placeholder) with payload:");
   log(JSON.stringify(payload, null, 2));
@@ -342,11 +322,6 @@ async function copyPromptToClipboard() {
 }
 
 /* ---------- Helpers & events ---------- */
-function updateStepsCfg() {
-  stepsVal.textContent = stepsEl.value;
-  cfgVal.textContent = cfgEl.value;
-}
-
 promptEl.addEventListener('input', updateStats);
 promptEl.addEventListener('keydown', (e) => {
   if (e.key === 'Tab') {
@@ -356,8 +331,6 @@ promptEl.addEventListener('keydown', (e) => {
 });
 negativeEl.addEventListener('input', () => {/* no-op for now */});
 copyBtn.addEventListener('click', copyPromptToClipboard);
-stepsEl.addEventListener('input', updateStepsCfg);
-cfgEl.addEventListener('input', updateStepsCfg);
 generateBtn.addEventListener('click', generateImage);
 savePresetBtn.addEventListener('click', savePreset);
 presetSelect.addEventListener('change', (e) => {
@@ -390,6 +363,5 @@ window.addEventListener('load', () => {
   renderHistory();
   loadPresetOptions();
   updateStats();
-  updateStepsCfg();
-  log("Prompt Assist ready with Favorites & Clipboard History.");
+  log("Prompt Assist ready (Generation Options removed).");
 });
