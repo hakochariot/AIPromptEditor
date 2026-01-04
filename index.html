@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Prompt Assist — AI画像生成プロンプト入力支援</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="container">
+    <h1>Prompt Assist</h1>
+
+    <section class="editor">
+      <label for="prompt">Prompt (メイン)</label>
+      <textarea id="prompt" placeholder="例: A fantasy landscape, dramatic lighting, highly detailed..."></textarea>
+      <div class="meta-row">
+        <div id="suggestions" class="suggestions" aria-live="polite"></div>
+        <div class="stats">
+          <span id="charCount">0 chars</span> ·
+          <span id="wordCount">0 words</span> ·
+          <span id="tokenEstimate">~0 tokens</span>
+        </div>
+      </div>
+
+      <label for="negative">Negative Prompt (ネガティブ)</label>
+      <textarea id="negative" placeholder="例: low quality, blurry, deformed..."></textarea>
+
+      <div class="tags-row">
+        <div class="left-col">
+          <strong>Styles / Artists</strong>
+          <div id="tagButtons" class="tag-buttons"></div>
+        </div>
+
+        <div class="right-col">
+          <strong>Favorites（よく使う文言）</strong>
+          <div class="favorites-controls">
+            <input id="favInput" placeholder="Add favorite phrase..." />
+            <button id="addFavBtn" type="button">Add</button>
+          </div>
+          <div id="favorites" class="favorites"></div>
+        </div>
+      </div>
+
+      <details class="options" open>
+        <summary>Generation Options</summary>
+        <div class="options-grid">
+          <label>Seed
+            <input id="seed" type="number" placeholder="random" />
+          </label>
+          <label>Steps
+            <input id="steps" type="range" min="1" max="150" value="30" />
+            <span id="stepsVal">30</span>
+          </label>
+          <label>CFG Scale
+            <input id="cfg" type="range" min="1" max="30" value="7.5" step="0.1" />
+            <span id="cfgVal">7.5</span>
+          </label>
+          <label>Sampler
+            <select id="sampler">
+              <option>DDIM</option>
+              <option>PLMS</option>
+              <option>Euler a</option>
+              <option>Euler</option>
+            </select>
+          </label>
+        </div>
+      </details>
+
+      <div class="actions">
+        <button id="copyBtn">Copy Prompt</button>
+        <button id="savePreset">Save Preset</button>
+        <select id="presetSelect"><option value="">Load Preset...</option></select>
+        <button id="generate">Generate (placeholder)</button>
+      </div>
+
+      <div id="log" class="log" aria-live="polite"></div>
+
+      <section class="history-section">
+        <div class="history-header">
+          <h3>Clipboard History</h3>
+          <div>
+            <button id="clearHistoryBtn" type="button">Clear All</button>
+          </div>
+        </div>
+        <div id="clipboardHistory" class="clipboard-history" aria-live="polite"></div>
+      </section>
+
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
