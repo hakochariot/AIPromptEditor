@@ -3,52 +3,52 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Prompt Assist — AI画像生成プロンプト入力支援</title>
+  <title>プロンプトアシスト — AI画像生成プロンプト入力支援</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <main class="container">
-    <h1>Prompt Assist</h1>
+    <h1>プロンプトアシスト</h1>
 
     <section class="editor">
-      <label for="prompt">Prompt (メイン)</label>
-      <textarea id="prompt" placeholder="例: A fantasy landscape, dramatic lighting, highly detailed..."></textarea>
+      <label for="prompt">プロンプト（メイン）</label>
+      <textarea id="prompt" placeholder="例: ファンタジーの風景、劇的なライティング、高精細..."></textarea>
       <div class="meta-row">
         <div id="suggestions" class="suggestions" aria-live="polite"></div>
         <div class="stats">
-          <span id="charCount">0 chars</span> ·
-          <span id="wordCount">0 words</span> ·
-          <span id="tokenEstimate">~0 tokens</span>
+          <span id="charCount">0 文字</span> ·
+          <span id="wordCount">0 単語</span> ·
+          <span id="tokenEstimate">〜0 トークン</span>
         </div>
       </div>
 
-      <label for="negative">Negative Prompt (ネガティブ)</label>
-      <textarea id="negative" placeholder="例: low quality, blurry, deformed..."></textarea>
+      <label for="negative">ネガティブプロンプト</label>
+      <textarea id="negative" placeholder="例: 低品質, ぼやけ, 変形..."></textarea>
 
       <div class="tags-row">
         <div class="right-col">
-          <strong>Favorites（よく使う文言）</strong>
+          <strong>よく使う文言（Favorites）</strong>
           <div class="favorites-controls">
-            <input id="favInput" placeholder="Add favorite phrase..." />
-            <button id="addFavBtn" type="button">Add</button>
+            <input id="favInput" placeholder="よく使う文言を追加..." />
+            <button id="addFavBtn" type="button">追加</button>
           </div>
           <div id="favorites" class="favorites"></div>
         </div>
       </div>
 
       <div class="actions">
-        <button id="copyBtn">Copy Prompt</button>
-        <button id="savePreset">Save Preset</button>
-        <select id="presetSelect"><option value="">Load Preset...</option></select>
+        <button id="copyBtn">プロンプトをコピー</button>
+        <button id="savePreset">プリセットを保存</button>
+        <select id="presetSelect"><option value="">プリセットを読み込む...</option></select>
       </div>
 
       <div id="log" class="log" aria-live="polite"></div>
 
       <section class="history-section">
         <div class="history-header">
-          <h3>Clipboard History</h3>
+          <h3>クリップボード履歴</h3>
           <div>
-            <button id="clearHistoryBtn" type="button">Clear All</button>
+            <button id="clearHistoryBtn" type="button">すべてクリア</button>
           </div>
         </div>
         <div id="clipboardHistory" class="clipboard-history" aria-live="polite"></div>

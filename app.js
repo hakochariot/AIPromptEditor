@@ -1,5 +1,5 @@
 // app.js — Prompt Assist (Vanilla JS) with Clipboard History & Favorites
-// Note: Styles/Artists (TAGS) removed, and related DOM logic eliminated.
+// 日本語化済み（Generate/Styles欄は削除済み）
 
 const promptEl = document.getElementById('prompt');
 const negativeEl = document.getElementById('negative');
@@ -20,9 +20,9 @@ const clipboardHistoryEl = document.getElementById('clipboardHistory');
 const clearHistoryBtn = document.getElementById('clearHistoryBtn');
 
 const SUGGESTIONS = [
-  "highly detailed", "8k", "cinematic lighting", "photorealistic",
-  "anime style", "studio photo", "bokeh", "ultra wide angle",
-  "concept art", "digital painting", "vivid colors", "soft lighting"
+  "高精細", "8K", "映画的なライティング", "フォトリアル",
+  "アニメ風", "スタジオ写真", "ボケ", "超広角",
+  "コンセプトアート", "デジタルペインティング", "鮮やかな色彩", "ソフトライティング"
 ];
 
 // localStorage keys
@@ -60,15 +60,15 @@ function insertAtCursor(textarea, text) {
   textarea.focus();
 }
 
-// Simple stats + rough token estimate
+// 簡易統計 + トークン概算
 function updateStats() {
   const v = promptEl.value;
   const chars = v.length;
   const words = v.trim().length === 0 ? 0 : v.trim().split(/\s+/).length;
   const tokenEstimate = Math.ceil(words * 1.3);
-  charCountEl.textContent = `${chars} chars`;
-  wordCountEl.textContent = `${words} words`;
-  tokenEstimateEl.textContent = `~${tokenEstimate} tokens`;
+  charCountEl.textContent = `${chars} 文字`;
+  wordCountEl.textContent = `${words} 単語`;
+  tokenEstimateEl.textContent = `〜${tokenEstimate} トークン`;
 }
 
 function buildFullPrompt() {
@@ -108,7 +108,7 @@ function renderFavorites() {
     remove.type = 'button';
     remove.className = 'remove';
     remove.textContent = '✕';
-    remove.title = 'Remove favorite';
+    remove.title = 'お気に入りを削除';
     remove.addEventListener('click', (e) => {
       e.stopPropagation();
       removeFavorite(i);
@@ -124,7 +124,7 @@ function addFavorite(text) {
   if (!list.includes(text)) list.unshift(text);
   saveFavorites(list);
   renderFavorites();
-  log('Favorite added.');
+  log('お気に入りを追加しました。');
 }
 function removeFavorite(index) {
   const list = loadFavorites();
@@ -132,10 +132,10 @@ function removeFavorite(index) {
   const removed = list.splice(index, 1);
   saveFavorites(list);
   renderFavorites();
-  log('Favorite removed: ' + (removed[0] || ''));
+  log('お気に入りを削除しました: ' + (removed[0] || ''));
 }
 
-/* ---------- Clipboard History (localStorage) ---------- */
+/* ---------- クリップボード履歴 (localStorage) ---------- */
 function loadHistory() {
   try {
     return JSON.parse(localStorage.getItem(LS_HISTORY_KEY) || '[]');
@@ -149,7 +149,7 @@ function saveHistory(list) {
 function addHistoryEntry(text) {
   if (!text) return;
   const list = loadHistory();
-  if (list.length && list[0].text === text) return;
+  if (list.length && list[0].text === text) return; // 直前と同じなら追加しない
   const entry = {
     text,
     ts: Date.now()
@@ -169,7 +169,7 @@ function removeHistoryEntry(idx) {
 function clearHistory() {
   localStorage.removeItem(LS_HISTORY_KEY);
   renderHistory();
-  log('History cleared.');
+  log('履歴をクリアしました。');
 }
 function renderHistory() {
   const list = loadHistory();
@@ -177,7 +177,7 @@ function renderHistory() {
   if (!list.length) {
     const p = document.createElement('div');
     p.className = 'history-item';
-    p.textContent = 'No clipboard history yet.';
+    p.textContent = '履歴はまだありません。';
     clipboardHistoryEl.appendChild(p);
     return;
   }
@@ -201,30 +201,30 @@ function renderHistory() {
 
     const insertBtn = document.createElement('button');
     insertBtn.type = 'button';
-    insertBtn.textContent = 'Insert';
-    insertBtn.title = 'Insert into prompt';
+    insertBtn.textContent = '挿入';
+    insertBtn.title = 'プロンプトに挿入';
     insertBtn.addEventListener('click', () => {
       insertAtCursor(promptEl, entry.text);
     });
 
     const copyBtnLocal = document.createElement('button');
     copyBtnLocal.type = 'button';
-    copyBtnLocal.textContent = 'Copy';
-    copyBtnLocal.title = 'Copy to clipboard';
+    copyBtnLocal.textContent = 'コピー';
+    copyBtnLocal.title = 'クリップボードにコピー';
     copyBtnLocal.addEventListener('click', async () => {
       try {
         await navigator.clipboard.writeText(entry.text);
-        addHistoryEntry(entry.text);
-        log('History item copied to clipboard.');
+        addHistoryEntry(entry.text); // 先頭に持ってくる
+        log('履歴項目をコピーしました。');
       } catch (err) {
-        log('Copy failed: ' + err, true);
+        log('コピーに失敗しました: ' + err, true);
       }
     });
 
     const delBtn = document.createElement('button');
     delBtn.type = 'button';
-    delBtn.textContent = 'Delete';
-    delBtn.title = 'Delete from history';
+    delBtn.textContent = '削除';
+    delBtn.title = '履歴から削除';
     delBtn.addEventListener('click', () => {
       removeHistoryEntry(idx);
     });
@@ -239,11 +239,11 @@ function renderHistory() {
   });
 }
 
-/* ---------- Presets (localStorage) ----------
-   Presets store prompt and negative only.
+/* ---------- プリセット (localStorage) ----------
+   プリセットはプロンプトとネガティブのみ保存します。
 */
 function savePreset() {
-  const name = prompt("Preset name?");
+  const name = prompt("プリセット名を入力してください。");
   if (!name) return;
   const p = {
     name,
@@ -254,12 +254,12 @@ function savePreset() {
   list.push(p);
   localStorage.setItem(LS_PRESETS_KEY, JSON.stringify(list));
   loadPresetOptions();
-  log("Preset saved: " + name);
+  log("プリセットを保存しました: " + name);
 }
 
 function loadPresetOptions() {
   const list = JSON.parse(localStorage.getItem(LS_PRESETS_KEY) || '[]');
-  presetSelect.innerHTML = '<option value="">Load Preset...</option>';
+  presetSelect.innerHTML = '<option value="">プリセットを読み込む...</option>';
   list.forEach((p, idx) => {
     const opt = document.createElement('option');
     opt.value = String(idx);
@@ -275,22 +275,22 @@ function applyPreset(index) {
   promptEl.value = p.prompt || '';
   negativeEl.value = p.negative || '';
   updateStats();
-  log("Preset applied: " + p.name);
+  log("プリセットを適用しました: " + p.name);
 }
 
-/* ---------- Copy behavior (adds to history) ---------- */
+/* ---------- コピー動作（履歴へ追加） ---------- */
 async function copyPromptToClipboard() {
   const full = buildFullPrompt();
   try {
     await navigator.clipboard.writeText(full);
-    log("Prompt copied to clipboard!");
+    log("プロンプトをクリップボードにコピーしました！");
     addHistoryEntry(full);
   } catch (err) {
-    log("Copy failed: " + err, true);
+    log("コピーに失敗しました: " + err, true);
   }
 }
 
-/* ---------- Helpers & events ---------- */
+/* ---------- イベント & 初期化 ---------- */
 promptEl.addEventListener('input', updateStats);
 promptEl.addEventListener('keydown', (e) => {
   if (e.key === 'Tab') {
@@ -298,7 +298,7 @@ promptEl.addEventListener('keydown', (e) => {
     if (SUGGESTIONS.length) insertSuggestion(SUGGESTIONS[0]);
   }
 });
-negativeEl.addEventListener('input', () => {/* no-op for now */});
+negativeEl.addEventListener('input', () => {/* no-op */});
 copyBtn.addEventListener('click', copyPromptToClipboard);
 savePresetBtn.addEventListener('click', savePreset);
 presetSelect.addEventListener('change', (e) => {
@@ -320,15 +320,14 @@ favInput.addEventListener('keydown', (e) => {
 });
 
 clearHistoryBtn.addEventListener('click', () => {
-  if (confirm('Clear clipboard history?')) clearHistory();
+  if (confirm('クリップボード履歴を削除しますか？')) clearHistory();
 });
 
-/* ---------- Init ---------- */
 window.addEventListener('load', () => {
   renderSuggestions();
   renderFavorites();
   renderHistory();
   loadPresetOptions();
   updateStats();
-  log("Prompt Assist ready (Styles/Artists removed).");
+  log("準備ができました。");
 });
