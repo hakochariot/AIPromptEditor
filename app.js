@@ -1,6 +1,5 @@
 // app.js — Prompt Assist (Vanilla JS) with Clipboard History & Favorites
-// Updated: GitHub Gist の URL を保存して favorites を読み書きできる機能を追加
-// 注意: Gist へ「書き込み」するには Personal Access Token (scope: gist) が必要です。
+// Updated: per-field copy buttons (prompt & negative) placed alongside each textarea.
 
 const promptEl = document.getElementById('prompt');
 const negativeEl = document.getElementById('negative');
@@ -23,13 +22,6 @@ const addFavBtn = document.getElementById('addFavBtn');
 const clipboardHistoryEl = document.getElementById('clipboardHistory');
 const clearHistoryBtn = document.getElementById('clearHistoryBtn');
 
-const gistUrlInput = document.getElementById('gistUrlInput');
-const gistTokenInput = document.getElementById('gistTokenInput');
-const saveGistBtn = document.getElementById('saveGistBtn');
-const loadGistBtn = document.getElementById('loadGistBtn');
-const pushGistBtn = document.getElementById('pushGistBtn');
-const gistStatus = document.getElementById('gistStatus');
-
 const SUGGESTIONS = [
   "高精細", "8K", "映画的なライティング", "フォトリアル",
   "アニメ風", "スタジオ写真", "ボケ", "超広角",
@@ -41,11 +33,60 @@ const LS_FAV_KEY = 'pa_favorites';
 const LS_HISTORY_KEY = 'pa_clip_history';
 const LS_PRESETS_KEY = 'pa_presets';
 const LS_NEGATIVE_OPEN = 'pa_negative_open';
-const LS_GIST_URL = 'pa_gist_url';
-const LS_GIST_TOKEN = 'pa_gist_token';
 const MAX_HISTORY = 100;
 
-/* ---------- Helpers: Favorites/localStorage ---------- */
+function renderSuggestions() {
+  suggestionsEl.innerHTML = '';
+  for (const s of SUGGESTIONS) {
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'suggestion-chip';
+    chip.textContent = s;
+    chip.addEventListener('click', () => insertSuggestion(s));
+    suggestionsEl.appendChild(chip);
+  }
+}
+
+function insertSuggestion(text) {
+  if (promptEl.value.trim().length === 0) promptEl.value = text;
+  else promptEl.value = promptEl.value.trim() + ', ' + text;
+  updateStats();
+  promptEl.focus();
+}
+
+function insertAtCursor(textarea, text) {
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  const val = textarea.value;
+  textarea.value = val.slice(0, start) + (start===0 ? text : ' ' + text) + val.slice(end);
+  textarea.selectionStart = textarea.selectionEnd = start + text.length + (start===0?0:1);
+  updateStats();
+  textarea.focus();
+}
+
+// 簡易統計 + トークン概算
+function updateStats() {
+  const v = promptEl.value;
+  const chars = v.length;
+  const words = v.trim().length === 0 ? 0 : v.trim().split(/\s+/).length;
+  const tokenEstimate = Math.ceil(words * 1.3);
+  charCountEl.textContent = `${chars} 文字`;
+  wordCountEl.textContent = `${words} 単語`;
+  tokenEstimateEl.textContent = `〜${tokenEstimate} トークン`;
+}
+
+function buildFullPrompt() {
+  return promptEl.value.trim();
+}
+
+function log(msg, isError=false) {
+  const el = document.createElement('div');
+  el.textContent = msg;
+  el.style.color = isError ? '#ff8a8a' : 'var(--muted)';
+  logEl.prepend(el);
+}
+
+/* ---------- Favorites (localStorage) ---------- */
 function loadFavorites() {
   try {
     return JSON.parse(localStorage.getItem(LS_FAV_KEY) || '[]');
@@ -98,7 +139,7 @@ function removeFavorite(index) {
   log('お気に入りを削除しました: ' + (removed[0] || ''));
 }
 
-/* ---------- Clipboard History (localStorage) ---------- */
+/* ---------- クリップボード履歴 (localStorage) ---------- */
 function loadHistory() {
   try {
     return JSON.parse(localStorage.getItem(LS_HISTORY_KEY) || '[]');
@@ -202,55 +243,9 @@ function renderHistory() {
   });
 }
 
-/* ---------- Suggestions / Insert helpers ---------- */
-function renderSuggestions() {
-  suggestionsEl.innerHTML = '';
-  for (const s of SUGGESTIONS) {
-    const chip = document.createElement('button');
-    chip.type = 'button';
-    chip.className = 'suggestion-chip';
-    chip.textContent = s;
-    chip.addEventListener('click', () => insertSuggestion(s));
-    suggestionsEl.appendChild(chip);
-  }
-}
-function insertSuggestion(text) {
-  if (promptEl.value.trim().length === 0) promptEl.value = text;
-  else promptEl.value = promptEl.value.trim() + ', ' + text;
-  updateStats();
-  promptEl.focus();
-}
-function insertAtCursor(textarea, text) {
-  const start = textarea.selectionStart;
-  const end = textarea.selectionEnd;
-  const val = textarea.value;
-  textarea.value = val.slice(0, start) + (start===0 ? text : ' ' + text) + val.slice(end);
-  textarea.selectionStart = textarea.selectionEnd = start + text.length + (start===0?0:1);
-  updateStats();
-  textarea.focus();
-}
-
-/* ---------- Stats / UI helpers ---------- */
-function updateStats() {
-  const v = promptEl.value;
-  const chars = v.length;
-  const words = v.trim().length === 0 ? 0 : v.trim().split(/\s+/).length;
-  const tokenEstimate = Math.ceil(words * 1.3);
-  charCountEl.textContent = `${chars} 文字`;
-  wordCountEl.textContent = `${words} 単語`;
-  tokenEstimateEl.textContent = `〜${tokenEstimate} トークン`;
-}
-function buildFullPrompt() {
-  return promptEl.value.trim();
-}
-function log(msg, isError=false) {
-  const el = document.createElement('div');
-  el.textContent = msg;
-  el.style.color = isError ? '#ff8a8a' : 'var(--muted)';
-  logEl.prepend(el);
-}
-
-/* ---------- Presets (unchanged) ---------- */
+/* ---------- プリセット (localStorage) ----------
+   プリセットはプロンプトとネガティブのみ保存します。
+*/
 function savePreset() {
   const name = prompt("プリセット名を入力してください。");
   if (!name) return;
@@ -265,6 +260,7 @@ function savePreset() {
   loadPresetOptions();
   log("プリセットを保存しました: " + name);
 }
+
 function loadPresetOptions() {
   const list = JSON.parse(localStorage.getItem(LS_PRESETS_KEY) || '[]');
   presetSelect.innerHTML = '<option value="">プリセットを読み込む...</option>';
@@ -275,6 +271,7 @@ function loadPresetOptions() {
     presetSelect.appendChild(opt);
   });
 }
+
 function applyPreset(index) {
   const list = JSON.parse(localStorage.getItem(LS_PRESETS_KEY) || '[]');
   const p = list[index];
@@ -285,7 +282,7 @@ function applyPreset(index) {
   log("プリセットを適用しました: " + p.name);
 }
 
-/* ---------- Copy helpers ---------- */
+/* ---------- コピーヘルパー（任意のテキストをコピーして履歴へ追加） ---------- */
 async function copyAndRecord(text, labelForLog = 'コピー') {
   if (!text) {
     log('コピーするテキストが空です。', true);
@@ -300,172 +297,12 @@ async function copyAndRecord(text, labelForLog = 'コピー') {
   }
 }
 
-/* ---------- Gist helpers: parse ID, fetch, push ---------- */
-function saveGistConfigToLocal() {
-  try {
-    const url = (gistUrlInput.value || '').trim();
-    const token = (gistTokenInput.value || '').trim();
-    if (url) localStorage.setItem(LS_GIST_URL, url);
-    else localStorage.removeItem(LS_GIST_URL);
-    if (token) localStorage.setItem(LS_GIST_TOKEN, token);
-    else localStorage.removeItem(LS_GIST_TOKEN);
-    updateGistStatus('Gist 設定を保存しました。');
-  } catch (e) {
-    updateGistStatus('Gist 設定の保存に失敗しました。', true);
-  }
-}
-function loadGistConfigToUI() {
-  const url = localStorage.getItem(LS_GIST_URL) || '';
-  const token = localStorage.getItem(LS_GIST_TOKEN) || '';
-  gistUrlInput.value = url;
-  gistTokenInput.value = token;
-}
-function extractGistIdFromUrl(u) {
-  try {
-    const parsed = new URL(u);
-    const parts = parsed.pathname.split('/').filter(Boolean);
-    // typical: /username/gistid
-    for (let i = parts.length - 1; i >= 0; i--) {
-      const p = parts[i];
-      if (/^[0-9a-f]{5,}$/i.test(p)) return p;
-    }
-    return parts[parts.length - 1] || '';
-  } catch (e) {
-    // fallback: try to find hex sequence
-    const m = u.match(/([0-9a-f]{5,})/i);
-    return m ? m[1] : '';
-  }
-}
-function updateGistStatus(msg, isError=false) {
-  gistStatus.textContent = msg;
-  gistStatus.style.color = isError ? '#ff8a8a' : 'var(--muted)';
-}
-
-// Fetch gist and merge favorites into local
-async function fetchFavoritesFromGist() {
-  const url = (gistUrlInput.value || '').trim() || localStorage.getItem(LS_GIST_URL);
-  if (!url) {
-    updateGistStatus('Gist の URL が設定されていません。', true);
-    return;
-  }
-  const gistId = extractGistIdFromUrl(url);
-  if (!gistId) {
-    updateGistStatus('Gist ID を URL から抽出できません。URL を確認してください。', true);
-    return;
-  }
-  updateGistStatus('Gist を取得中...');
-  try {
-    const res = await fetch(`https://api.github.com/gists/${gistId}`);
-    if (!res.ok) {
-      const txt = await res.text();
-      updateGistStatus(`Gist の取得に失敗しました: ${res.status} ${txt}`, true);
-      return;
-    }
-    const data = await res.json();
-    const files = data.files || {};
-    let fileName = 'favorites.json';
-    if (!files[fileName]) {
-      // pick first file
-      const keys = Object.keys(files);
-      if (keys.length === 0) {
-        updateGistStatus('Gist にファイルが見つかりません。', true);
-        return;
-      }
-      fileName = keys[0];
-    }
-    const content = files[fileName].content;
-    let imported;
-    try {
-      imported = JSON.parse(content);
-      if (!Array.isArray(imported)) throw new Error('期待する形式ではありません（配列）');
-    } catch (e) {
-      updateGistStatus('Gist のファイルが JSON 配列ではありません。', true);
-      return;
-    }
-    // マージ（重複を避けて remote -> local の順に追加）
-    const local = loadFavorites();
-    const merged = [...imported.filter(i => !local.includes(i)), ...local];
-    saveFavorites(merged);
-    renderFavorites();
-    updateGistStatus(`Gist から読み込みました（${fileName}）。`);
-    log(`Gist (${gistId}/${fileName}) からお気に入りを読み込みました。`);
-  } catch (err) {
-    updateGistStatus('Gist の取得中にエラーが発生しました。', true);
-    log('Gist fetch error: ' + err, true);
-  }
-}
-
-// Push local favorites to gist (PATCH) - requires token
-async function pushFavoritesToGist() {
-  const url = (gistUrlInput.value || '').trim() || localStorage.getItem(LS_GIST_URL);
-  const token = (gistTokenInput.value || '').trim() || localStorage.getItem(LS_GIST_TOKEN);
-  if (!url) {
-    updateGistStatus('Gist の URL が設定されていません。', true);
-    return;
-  }
-  const gistId = extractGistIdFromUrl(url);
-  if (!gistId) {
-    updateGistStatus('Gist ID を URL から抽出できません。URL を確認してください。', true);
-    return;
-  }
-  if (!token) {
-    updateGistStatus('Gist を更新するには GitHub トークンが必要です（Gist scope）。', true);
-    return;
-  }
-  updateGistStatus('Gist に保存中...');
-  try {
-    // まず既存ファイル名を取得
-    const metaRes = await fetch(`https://api.github.com/gists/${gistId}`);
-    if (!metaRes.ok) {
-      updateGistStatus('Gist メタ取得に失敗しました: ' + metaRes.status, true);
-      return;
-    }
-    const meta = await metaRes.json();
-    const files = Object.keys(meta.files || {});
-    let fileName = 'favorites.json';
-    if (!files.includes(fileName)) {
-      if (files.length === 0) {
-        // create favorites.json by updating with that filename
-        fileName = 'favorites.json';
-      } else {
-        fileName = files[0];
-      }
-    }
-    const favorites = loadFavorites();
-    const body = {
-      files: {
-        [fileName]: {
-          content: JSON.stringify(favorites, null, 2)
-        }
-      }
-    };
-    const patchRes = await fetch(`https://api.github.com/gists/${gistId}`, {
-      method: 'PATCH',
-      headers: {
-        'Authorization': `token ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(body)
-    });
-    if (!patchRes.ok) {
-      const txt = await patchRes.text();
-      updateGistStatus(`Gist 更新に失敗しました: ${patchRes.status} ${txt}`, true);
-      return;
-    }
-    updateGistStatus('Gist に保存しました。');
-    log('Gist にお気に入りを保存しました。');
-  } catch (err) {
-    updateGistStatus('Gist の保存中にエラーが発生しました。', true);
-    log('Gist push error: ' + err, true);
-  }
-}
-
-/* ---------- Negative fold state save/restore ---------- */
+/* ---------- ネガティブ折りたたみ状態の保存/復元 ---------- */
 function loadNegativeOpenState() {
   try {
     const v = localStorage.getItem(LS_NEGATIVE_OPEN);
     if (v === 'false') negativeDetails.open = false;
-    else negativeDetails.open = true; // default open
+    else negativeDetails.open = true; // デフォルトは開いている
   } catch (e) { /* ignore */ }
 }
 if (negativeDetails) {
@@ -476,7 +313,7 @@ if (negativeDetails) {
   });
 }
 
-/* ---------- Event wiring ---------- */
+/* ---------- イベント & 初期化 ---------- */
 promptEl.addEventListener('input', updateStats);
 promptEl.addEventListener('keydown', (e) => {
   if (e.key === 'Tab') {
@@ -512,24 +349,12 @@ clearHistoryBtn.addEventListener('click', () => {
   if (confirm('クリップボード履歴を削除しますか？')) clearHistory();
 });
 
-saveGistBtn.addEventListener('click', () => {
-  saveGistConfigToLocal();
-});
-loadGistBtn.addEventListener('click', async () => {
-  await fetchFavoritesFromGist();
-});
-pushGistBtn.addEventListener('click', async () => {
-  await pushFavoritesToGist();
-});
-
-/* ---------- Init ---------- */
 window.addEventListener('load', () => {
   renderSuggestions();
   renderFavorites();
   renderHistory();
   loadPresetOptions();
   loadNegativeOpenState();
-  loadGistConfigToUI();
   updateStats();
   log("準備ができました。");
 });

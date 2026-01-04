@@ -33,13 +33,13 @@ h1{
   border-radius:10px;
 }
 label{display:block;margin-top:8px;margin-bottom:6px;color:var(--muted);font-size:13px}
-textarea, input[type="text"], input[type="password"]{
+textarea{
   width:100%;
-  min-height:36px;
+  min-height:96px;
   background:transparent;
   color:var(--text);
   border:1px solid rgba(255,255,255,0.04);
-  padding:8px;
+  padding:10px;
   border-radius:6px;
   resize:vertical;
   font-size:14px;
@@ -116,9 +116,3 @@ label > span{display:block;margin-top:6px}
 }
 .negative-details[open] > summary{color:var(--text)}
 .negative-details textarea{margin-top:8px}
-
-/* Gist config */
-.gist-config{margin-top:10px;border:1px solid rgba(255,255,255,0.02);padding:8px;border-radius:8px;background:rgba(255,255,255,0.01)}
-.gist-row{display:flex;gap:8px;margin-top:6px}
-.gist-status{margin-top:8px;color:var(--muted);font-size:13px}
-.small{font-size:12px;color:var(--muted);margin-top:6px;display:block}

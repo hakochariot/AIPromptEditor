@@ -45,23 +45,7 @@
           <div class="favorites-controls">
             <input id="favInput" placeholder="よく使う文言を追加..." />
             <button id="addFavBtn" type="button">追加</button>
-            <!-- Gist 設定ボタンはここに表示 -->
           </div>
-
-          <!-- Gist 共有設定 -->
-          <div class="gist-config">
-            <label class="small">Gist URL（共有先）</label>
-            <input id="gistUrlInput" placeholder="https://gist.github.com/username/gistid" />
-            <div class="gist-row">
-              <button id="saveGistBtn" type="button">保存（ローカル保存）</button>
-              <button id="loadGistBtn" type="button">Gist から読み込む</button>
-              <button id="pushGistBtn" type="button">Gist に上書き保存</button>
-            </div>
-            <label class="small">GitHub トークン（任意、Gist 更新に必要）</label>
-            <input id="gistTokenInput" type="password" placeholder="ghp_xxx...（保存する場合は localStorage に格納されます）" />
-            <div id="gistStatus" class="gist-status" aria-live="polite"></div>
-          </div>
-
           <div id="favorites" class="favorites"></div>
         </div>
       </div>
