@@ -1,5 +1,5 @@
 // app.js — Prompt Assist (Vanilla JS) with Clipboard History & Favorites
-// Generation Options removed: steps/cfg/seed/sampler DOM elements and related logic eliminated.
+// Note: Generate button / generateImage logic removed.
 
 const promptEl = document.getElementById('prompt');
 const negativeEl = document.getElementById('negative');
@@ -9,7 +9,6 @@ const wordCountEl = document.getElementById('wordCount');
 const tokenEstimateEl = document.getElementById('tokenEstimate');
 const tagButtonsEl = document.getElementById('tagButtons');
 const copyBtn = document.getElementById('copyBtn');
-const generateBtn = document.getElementById('generate');
 const savePresetBtn = document.getElementById('savePreset');
 const presetSelect = document.getElementById('presetSelect');
 const logEl = document.getElementById('log');
@@ -259,7 +258,7 @@ function renderHistory() {
 }
 
 /* ---------- Presets (localStorage) ----------
-   Presets now store only prompt and negative (options were removed)
+   Presets store prompt and negative only.
 */
 function savePreset() {
   const name = prompt("Preset name?");
@@ -297,19 +296,7 @@ function applyPreset(index) {
   log("Preset applied: " + p.name);
 }
 
-/* ---------- Generate (placeholder) ---------- */
-async function generateImage() {
-  const payload = {
-    prompt: buildFullPrompt(),
-    negative_prompt: negativeEl.value
-  };
-  log("Generating (placeholder) with payload:");
-  log(JSON.stringify(payload, null, 2));
-  await new Promise(r => setTimeout(r, 600));
-  log("Done (simulated). Replace generateImage() with your API call to produce real images.");
-}
-
-/* ---------- Copy behavior (now adds to history) ---------- */
+/* ---------- Copy behavior (adds to history) ---------- */
 async function copyPromptToClipboard() {
   const full = buildFullPrompt();
   try {
@@ -331,7 +318,6 @@ promptEl.addEventListener('keydown', (e) => {
 });
 negativeEl.addEventListener('input', () => {/* no-op for now */});
 copyBtn.addEventListener('click', copyPromptToClipboard);
-generateBtn.addEventListener('click', generateImage);
 savePresetBtn.addEventListener('click', savePreset);
 presetSelect.addEventListener('change', (e) => {
   if (!e.target.value) return;
@@ -363,5 +349,5 @@ window.addEventListener('load', () => {
   renderHistory();
   loadPresetOptions();
   updateStats();
-  log("Prompt Assist ready (Generation Options removed).");
+  log("Prompt Assist ready (Generate button removed).");
 });

@@ -1,9 +1,7 @@
-# Prompt Assist (ローカルサンプル) — Generation Options removed
+# Prompt Assist (ローカルサンプル) — Generate ボタン削除版
 
-このバージョンでは「Generation Options」欄（steps / cfg / seed / sampler）を UI から取り除きました。
-- 理由: シンプル化とクライアントでの秘密情報混入を避けるため
-- 画像生成 API と連携する際は、必要なパラメータは別途 server/proxy 側で指定するか、フロント側に新しい UI を追加してください。
+このバージョンでは「Generate」ボタンとそれに紐づくフロント側の generateImage ロジックを一旦取り除きました。
 
-備考:
-- Preset は現在 prompt と negative のみを保存します。
-- 実際の画像生成 API を使う場合は、app.js の generateImage() を編集してプロキシ経由で呼び出してください。
+- 理由：UI をシンプルにするため。画像生成呼び出しは別プロキシ／サーバ側で実装する予定のため、一時的に削除しています。
+- Preset は prompt と negative のみを保存します。
+- 将来的に画像生成機能を戻す場合は、app.js に generateImage() を追加し、サーバプロキシ経由で外部APIを叩く実装を推奨します。
